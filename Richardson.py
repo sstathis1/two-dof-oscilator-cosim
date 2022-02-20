@@ -6,8 +6,8 @@ Created on Mon Nov  8 18:08:55 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
-from  OdF_Oscilator_dispModel import odfOscilatorDisp
-from OdF_Oscilator_forceModel import odfOscilatorForce
+from  model_disp import odfOscilatorDisp
+from model_force import odfOscilatorForce
 import sys
 from math import cos, sin, sqrt, exp					
 
