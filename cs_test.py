@@ -1,10 +1,8 @@
 """
-Created on Tue Nov 2 17:58:39 2021
-
-@author: Stefanos Stathis
-
 Contains a test script that executes an explicit co-simulation of a linear 2dof oscilator and plots the position response, 
 as well as the global and local errors.
+
+@author: Stefanos Stathis
 """
 
 from Richardson import Orchestrator
