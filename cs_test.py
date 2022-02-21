@@ -5,7 +5,7 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from Richardson import Orchestrator
+from Richardson_PI import Orchestrator
 import numpy as np
 import time
 
