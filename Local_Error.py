@@ -308,8 +308,8 @@ class Orchestrator():
         w2 = sqrt(3*k/m) # Δεύτερη Ιδιοσυχνότητα
         t0 = sqrt(m/2)*np.array([self.Z1[0, 0] + self.Z2[0, 0], self.Z1[0, 0] - self.Z2[0, 0]])
         t0_dot = sqrt(m/2)*np.array([self.Z1[1, 0] + self.Z2[1, 0], self.Z1[1, 0] - self.Z2[1, 0]])
-        z1 = c/(2*m*w1)
-        z2 = 1/sqrt(3)
+        z1 = 0.05
+        z2 = 0.05 * sqrt(3)
         wd1 = w1*sqrt(1-z1**2)
         wd2 = w2*sqrt(1-z2**2)
         t1 = np.zeros((len(self.time), 1))

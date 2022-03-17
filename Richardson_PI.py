@@ -48,8 +48,8 @@ class Orchestrator():
         self.b = 0.4/(self.polyDegree + 1)
         self.QMIN = 0.6
         self.QMAX = 1.1
-        self.HMAX = 0.5
-        self.HMIN = 1e-3
+        # Minimum step size for the automatic step
+        self.HMIN = 1e-4
     
     
     def setModel1(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
@@ -64,6 +64,8 @@ class Orchestrator():
         integrationMethod : what algorithm to use to integrate the model -- "Newmark" / "RK45"
         h : micro step for Newmark
         """
+        # Use Nyquist step as the maximum step the PI controller can select
+        self.HMAX = (3.1415 / sqrt(3 * k / m))
         self.microStep1 = h
         self.oscMethod1 = oscMethod
         if self.oscMethod1 == 'Force':
@@ -404,8 +406,8 @@ class Orchestrator():
         w2 = sqrt(3*k/m) # Δεύτερη Ιδιοσυχνότητα
         t0 = sqrt(m/2)*np.array([self.Z1[0, 0] + self.Z2[0, 0], self.Z1[0, 0] - self.Z2[0, 0]])
         t0_dot = sqrt(m/2)*np.array([self.Z1[1, 0] + self.Z2[1, 0], self.Z1[1, 0] - self.Z2[1, 0]])
-        z1 = c/(2*m*w1)
-        z2 = 1/sqrt(3)
+        z1 = 0.05
+        z2 = 0.05 * sqrt(3)
         wd1 = w1*sqrt(1-z1**2)
         wd2 = w2*sqrt(1-z2**2)
         t1 = np.zeros((len(self.time), 1))
