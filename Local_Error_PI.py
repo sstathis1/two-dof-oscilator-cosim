@@ -1,9 +1,3 @@
-"""
-Created on Mon Nov  8 18:08:55 2021
-
-@author: MrStevenn007
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 from  model_disp import odfOscilatorDisp
@@ -12,9 +6,25 @@ import sys
 from math import cos, sin, sqrt, exp
 
 class Orchestrator():
-    
+    """
+    A master algorithm for explicit co-simulation of 2 slave models with variable steps. 
+    At each time step we assign the analytical solution in order to calculate the local error due to co-simulation only.
+
+    @author: Stefanos Stathis
+    """  
     
     def __init__(self, time, k, tf, kc, cc, cosiMethod = 'Jacobi'):
+        """ 
+        Initializes the Master object
+        
+        Inputs: 
+        H : Macro Step (s)
+        k : Polynomial degree
+        tf : Final time of simulation (s)
+        kc : Coupling stifness (N/m)
+        cc : Coupling damping coefficient (Ns/m)
+        cosiMethod : Comunication method for the co-simulation (defaults to Parallel Jacobi)
+        """
         self.time = time
         self.polyDegree = k
         self.endTime = tf
@@ -30,6 +40,17 @@ class Orchestrator():
         
     
     def setModel1(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
+        """
+        Creates an object for the first model
+        
+        Input:
+        m : mass (kg)
+        k : sifness (Nm)
+        c : damping coefficient (Nm/s)
+        oscMethod : oscilation method -- 'Force' / 'Disp'
+        integrationMethod : what algorithm to use to integrate the model -- "Newmark" / "RK45"
+        h : micro step for Newmark
+        """
         self.microStep1 = h
         self.oscMethod1 = oscMethod
         if self.oscMethod1 == 'Force':
@@ -41,6 +62,17 @@ class Orchestrator():
         
     
     def setModel2(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
+        """
+        Creates an object for the second model
+        
+        Input:
+        m : mass (kg)
+        k : sifness (Nm)
+        c : damping coefficient (Nm/s)
+        oscMethod : oscilation method -- 'Force' / 'Disp'
+        integrationMethod : what algorithm to use to integrate the model -- "Newmark" / "RK45"
+        h : micro step for Newmark
+        """
         self.microStep2 = h
         self.oscMethod2 = oscMethod
         if self.oscMethod2 == 'Force':
@@ -52,6 +84,7 @@ class Orchestrator():
     
 
     def setStateSpaceMatrices(self):
+        """Creates the state space matrices for the 2 subsystems"""
         if self.oscMethod1 == 'Force':
             self.C2 = np.array([self.kc, self.cc])
             self.D2 = np.array([-self.kc, -self.cc])
@@ -79,16 +112,19 @@ class Orchestrator():
 
     
     def setStates(self, state1, state2):
+        """Saves the current state of the 2 subsystems"""
         self.Z1[:, self.currentMacro:self.currentMacro+1] = state1
         self.Z2[:, self.currentMacro:self.currentMacro+1] = state2
         
 
     def setOutputs(self, output1, output2):
+        """Saves the outputs of the 2 subsystems"""
         self.Y1[:, self.currentMacro:self.currentMacro+1] = output1
         self.Y2[:, self.currentMacro:self.currentMacro+1] = output2
         
     
     def setInput1(self):
+        """Computes the input to the first subsystem"""
         if self.oscMethod1 == 'Force':
             self.U1[0, self.currentMacro:self.currentMacro+1] =(
                 self.kc*(self.Z2[0, self.currentMacro] - self.Z1[0, self.currentMacro])
@@ -99,6 +135,7 @@ class Orchestrator():
         
         
     def setInput2(self):
+        """Computes the input to the second subsystem"""
         if self.oscMethod2 == 'Force':
             self.U2[0, self.currentMacro:self.currentMacro+1] =-(
                 self.kc*(self.Z2[0, self.currentMacro] - self.Z1[0, self.currentMacro])
@@ -108,7 +145,8 @@ class Orchestrator():
             self.U2[1, self.currentMacro:self.currentMacro+1] = self.Z1[1, self.currentMacro:self.currentMacro+1]
         
         
-    def sortModels(self):      
+    def sortModels(self):
+        """Sorts the models for the Gauss Seidel method"""      
         if self.oscMethod1 == 'Disp' and self.oscMethod2 == 'Force':
             self.firstModel = self.S2
             self.firstMethod = self.oscMethod2
@@ -128,10 +166,24 @@ class Orchestrator():
         
 
     def giveMacroTime(self):
+        """ Returns the current simulation time [Tn, Tn+1]"""
         return(self.time[self.currentMacro:self.currentMacro+2])
     
     
     def beginSimulation(self, z1, z2, y1, y2):
+        """ 
+        Simulates the given Orchestrator object and returns the estimated errors of both outputs
+
+        Inputs:
+        z1 : initial state 1 [x, v]
+        z2 : initial state 2 [x, v]
+        y1 : initial output 1 [x, v] or f
+        y2 : initial output 2 [x, v] or f
+
+        Outputs:
+        localErrorY1 : local error of output 1 (x (m), v (m/s)) or f (N)
+        localErrorY2 : local error of output 2 (x (m), v (m/s)) or f (N)
+        """
         self.setStateSpaceMatrices()
         self.setStates(z1, z2)
         self.setOutputs(y1, y2)
@@ -140,11 +192,11 @@ class Orchestrator():
         self.sortModels()
         while self.time[self.currentMacro] <= self.endTime:
             self.advanceStep()
-        #self.plotLocalError()
         return self.localErrorY1, self.localErrorY2
 
 
     def advanceStep(self):
+        """Advances the time by 1 iteration and returns the states and outputs that were computed"""
         if self.cosiMethod == 'Jacobi':
             self.setInput1()
             self.setInput2()
@@ -192,6 +244,7 @@ class Orchestrator():
             
 
     def simulateModel(self, model, oscMethod):
+        """Calls on the model to simulate it for a given time window using it's oscilation method"""
         model.getTime(self.giveMacroTime())
         if oscMethod == 'Force':
             u, time = self.inputPrediction(model, oscMethod)
@@ -209,6 +262,14 @@ class Orchestrator():
 
 
     def inputPrediction(self, model, oscMethod):
+        """
+        Takes as input a model object and it's oscilation method and returns the values 
+        that are to be used for extrapolation or interpolation of the input.
+        
+        Outputs:
+        u : vector containing the values of input
+        time : vector containing the time values
+        """
         if self.currentMacro < self.polyDegree:
             if model == self.S1:
                 u = self.U1[:, 0:self.currentMacro+1]
@@ -228,6 +289,7 @@ class Orchestrator():
 
 
     def analyticalSolution(self):
+        """Computes and saves the analytical solution of the problem based on mathematical formulas"""
         k = self.S1.k
         m = self.S1.m
         c = self.S1.c
@@ -235,8 +297,8 @@ class Orchestrator():
         w2 = sqrt(3*k/m) # Δεύτερη Ιδιοσυχνότητα
         t0 = sqrt(m/2)*np.array([self.Z1[0, 0] + self.Z2[0, 0], self.Z1[0, 0] - self.Z2[0, 0]])
         t0_dot = sqrt(m/2)*np.array([self.Z1[1, 0] + self.Z2[1, 0], self.Z1[1, 0] - self.Z2[1, 0]])
-        z1 = c/(2*m*w1)
-        z2 = 1/sqrt(3)
+        z1 = 0.05
+        z2 = 0.05 * sqrt(3)
         wd1 = w1*sqrt(1-z1**2)
         wd2 = w2*sqrt(1-z2**2)
         t1 = np.zeros((len(self.time), 1))
@@ -273,6 +335,7 @@ class Orchestrator():
         
         
     def calculateError(self, y1, y2):
+        """Calculates the local errors because of co-simulation"""
         if self.oscMethod1 == 'Disp':
             self.localErrorY2[:, self.currentMacro] = np.linalg.norm(y2[:, 0] 
                                                       - self.Z2Analytical[:, self.currentMacro])
@@ -288,6 +351,7 @@ class Orchestrator():
 
 
     def plotOutputs(self):
+        """Plots the numerical positions x1num and x2num and compares them with the analytical positions x1anal, x2anal"""
         plt.figure(figsize=(14,8))
         plt.title('Απόκριση Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
                   f' {self.cosiMethod}')
@@ -304,6 +368,7 @@ class Orchestrator():
         
         
     def plotLocalError(self):
+        """Plots the local error estimations for y1, y2 that were computed"""
         plt.figure(figsize=(14,8))
         plt.title(f'Σχετικό σφάλμα άμεσης συν-προσομοίωσης με βήμα {self.stepDuration}' 
                   f' {self.cosiMethod}')

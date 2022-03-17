@@ -1,18 +1,28 @@
-"""
-Created on Fri Nov  5 18:38:10 2021
-
-@author: MrStevenn007
-"""
-
 import numpy as np
 from scipy.integrate import solve_ivp
 from scipy.interpolate import interp1d
 
 
 class odfOscilatorForce:
+    """
+    Contains the model of a one degree of freedom linear oscilator with damping, 
+    which oscilates due to a force on it's mass.
+
+    @author: Stefanos Stathis
+    """
     
     
     def __init__(self, m, k, c, cc, integration_method = 'Newmark'):
+        """
+        Initializes the model object.
+
+        Inputs: 
+        m : Mass (kg)
+        k : Stifness (N/m)
+        c : Damping coefficient (Ns/m)
+        cc : Coupling damping coefficient (Ns/m)
+        integration_method : How to integrate the model internally (defaults to Newmark) options: Newmark, RK45.
+        """
         self.cc = cc
         self.m = m
         self.k = k
@@ -21,28 +31,77 @@ class odfOscilatorForce:
     
        
     def getInitials(self, X0):
+        """
+        Gets the initial state of the model
+
+        Input: 
+        X0 : Initial state of the model (x, v)
+        """
         self.X0 = X0
         
     
     def getTime(self, t_eval):
+        """
+        Get's the simulation period of the model
+
+        Input:
+        teval : Time window (tin, tf)
+        """
         self.t0 = t_eval[0]
         self.tf = t_eval[-1]
     
 
     def getStateSpaceMatrices(self, C, D):
+        """
+        Get's the state space matrices
+
+        Inputs:
+        C : State matrix
+        D : Input matrix
+        example : y(t) = C * x(t) + D * u(t)
+        """
         self.C = C
         self.D = D
 
 
     def extrapolateInput(self, u, time):
+        """
+        Extrapolates the input 
+
+        Inputs: 
+        u : Vector of the force applied on the mass at previous time points.
+        time: Vector of the corresponding previous time points.
+        """
         self.input = interp1d(time, u, kind=len(time)-1, fill_value='extrapolate')
 
 
     def ode(self, t, x):
+        """
+        The ordinary differential equation we want to solve
+
+        Inputs:
+        t : time (s)
+        x : state [x (m), v (m/s)]
+        
+        Returns:
+        The solution of each differential equation.
+        (x(t), v(t))
+        """
         return([x[1], -self.k/self.m*x[0] - self.c/self.m*x[1] + self.input(t)/self.m])  
 
 
     def solve(self, h=1e-3):
+        """
+        Solves the differential equation starting from initial conditions X0 for the time window specified from teval.
+
+        Input:
+        h : micro step size (defaults to 0.001) should be at least 0.1 * Macro step size.
+
+        Returns:
+        The solution of the differential equation at tfinal specified in the teval input.
+        (x(tf), v(tf))
+        
+        """
         if self.integration_method == 'Newmark':
             self.micro_steps = int((self.tf - self.t0)/h)
             t = np.linspace(self.t0, self.tf, self.micro_steps+1)
