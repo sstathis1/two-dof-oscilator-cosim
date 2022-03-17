@@ -442,7 +442,10 @@ class Orchestrator():
         
         
     def calculateError(self):
-        """Calculates the absolute global error for the positions of the numerical solution in respect to the analytical solution and returns it"""
+        """
+        Calculates the absolute global error for the positions of the numerical solution in respect to the analytical solution 
+        and returns it
+        """
         self.absoluteError1 = np.abs((self.Z1-self.Z1Analytical))
         self.absoluteError2 = np.abs((self.Z2-self.Z2Analytical))
         if self.oscMethod2 == 'Force':
@@ -521,7 +524,10 @@ class Orchestrator():
         
         
     def plotGlobalError(self):
-        """Plots the absolute global error of the forces if oscilation method is 'Force' or of the positions if oscilation method is 'Disp'"""
+        """
+        Plots the absolute global error of the forces if oscilation method is 'Force' or of the positions if oscilation method 
+        is 'Disp
+        '"""
         plt.figure(figsize=(14,8))
         plt.title(f'Ολικό σφάλμα άμεσης συν-προσομοίωσης με μεταβλητό βήμα και μέθοδο' 
                   f' {self.cosiMethod}')
