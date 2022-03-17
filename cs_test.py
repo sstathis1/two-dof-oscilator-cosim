@@ -75,3 +75,4 @@ print(f"Co-Simulation finished correctly in : {end_time-start_time} second(s)")
 
 Co_Sim.plotOutputs()
 Co_Sim.plotLocalError()
+Co_Sim.plotStepSize()
