@@ -21,8 +21,8 @@ class Orchestrator():
         H : Macro Step (s)
         k : Polynomial degree
         tf : Final time of simulation (s)
-        kc : Coupling stifness (Nm)
-        cc : Coupling damping coefficient (Nm/s)
+        kc : Coupling stifness (N/m)
+        cc : Coupling damping coefficient (Ns/m)
         cosiMethod : Comunication method for the co-simulation (defaults to Parallel Jacobi)
         """
         self.stepDuration = H
