@@ -473,8 +473,8 @@ class Orchestrator():
                                *np.linalg.norm(self.y2Double-self.Y2[self.currentMacro].reshape(-1,1))))  
         if self.oscMethod1 == "Force" and self.oscMethod2 == "Force":
             self.TOL = 1e-1
-        elif self.oscMethod1 == "Force" and self.oscMethod2 == "Disp":
-            self.TOL = 1e-3
+        elif self.oscMethod1 == "Force" and self.oscMethod2 == "Disp" and self.cosiMethod == "Jacobi":
+            self.TOL = 1e-1
         else:
             self.TOL = 1e-4
         self.ERR = np.append(self.ERR, (((self.TOL/np.maximum(self.ESTY1[self.tmp], 

@@ -12,7 +12,7 @@ import time
 start_time = time.perf_counter()
 
 # Specify the data of the 2-DOF linear oscilator
-m = 1     # (kg)
+m = 1    # (kg)
 k = 100   # (N/m)
 
 # Specify a Rayleigh damping. C = β * Κ where β = c / k = 1 / (10 * ω1)
@@ -44,7 +44,7 @@ polyDegree = 0
 h = 1
 
 # Oscilation method of models
-Model1Method = 'Disp'
+Model1Method = 'Force'
 Model2Method = 'Disp'
 
 # Co-simulation comunication method to use
