@@ -205,7 +205,6 @@ class Orchestrator():
         self.setInput1()
         self.setInput2()
         self.sortModels()
-        self.doubleStepCheck = True
         while self.currentMacro < self.macroSteps:
             for i in range(2):
                 if self.doubleStepCheck == False:
