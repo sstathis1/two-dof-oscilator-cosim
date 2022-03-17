@@ -12,7 +12,7 @@ import time
 start_time = time.perf_counter()
 
 # Specify the data of the 2-DOF linear oscilator
-m = 1   # (kg)
+m = 1     # (kg)
 k = 100   # (N/m)
 
 # Specify a Rayleigh damping. C = β * Κ where β = c / k = 1 / (10 * ω1)
@@ -21,7 +21,7 @@ cc = c   # (Nsec/m)
 
 # Specify the initial conditions for the simulation
 x10 = 0  # (m)
-x20 = 0  # (m)
+x20 = 1  # (m)
 v10 = 1  # (m/sec)
 v20 = 0  # (m/sec)
 
@@ -35,7 +35,7 @@ initial2 = np.array([[x20], [v20]])
 tf = 12
 
 # Macro step
-H = 1e-2
+H = 0.5e-2
 
 # Interpolation / Extrapolation degree
 polyDegree = 0
@@ -44,11 +44,11 @@ polyDegree = 0
 h = 1
 
 # Oscilation method of models
-Model1Method = 'Force'
-Model2Method = 'Force'
+Model1Method = 'Disp'
+Model2Method = 'Disp'
 
 # Co-simulation comunication method to use
-CoSimMethod = 'Gauss'
+CoSimMethod = 'Jacobi'
 
 if Model1Method == 'Force':
     y2 = lc0
@@ -62,12 +62,15 @@ else:
 
 # Initialize the Co-Simulation
 Co_Sim = Orchestrator(H, polyDegree, tf, k, cc, CoSimMethod)
+print("Succesfully initialized the orchestrator object")
 
 # Create the 2 Subsystem models
 Co_Sim.setModel1(m, k, c, Model1Method, 'RK45', h)
 Co_Sim.setModel2(m, k, c, Model2Method, 'RK45', h)
+print("Succesfully created the 2 slave models")
 
 # Begin the Co-Simulation
+print("Begining of simulation...")
 Co_Sim.beginSimulation(initial1, initial2, y1, y2)
 
 end_time = time.perf_counter()

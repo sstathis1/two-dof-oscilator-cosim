@@ -46,7 +46,7 @@ class Orchestrator():
         # PI contoller settings
         self.a = 0.7/(self.polyDegree + 1)
         self.b = 0.4/(self.polyDegree + 1)
-        self.QMIN = 0.6
+        self.QMIN = 0.5
         self.QMAX = 1.1
         # Minimum step size for the automatic step
         self.HMIN = 1e-4
@@ -472,11 +472,11 @@ class Orchestrator():
             self.ESTY2 = np.append(self.ESTY2, (2**(self.polyDegree+1)/(2**(self.polyDegree+1)-1)
                                *np.linalg.norm(self.y2Double-self.Y2[self.currentMacro].reshape(-1,1))))  
         if self.oscMethod1 == "Force" and self.oscMethod2 == "Force":
-            self.TOL = 1e-2
+            self.TOL = 1e-1
         elif self.oscMethod1 == "Force" and self.oscMethod2 == "Disp":
-            self.TOL = 1e-4
+            self.TOL = 1e-3
         else:
-            self.TOL = 1e-5
+            self.TOL = 1e-4
         self.ERR = np.append(self.ERR, (((self.TOL/np.maximum(self.ESTY1[self.tmp], 
                                  self.ESTY2[self.tmp]))**self.a)*((np.maximum(self.ESTY1[self.tmp-1], 
                                  self.ESTY2[self.tmp-1])/self.TOL)**self.b)))
@@ -513,9 +513,9 @@ class Orchestrator():
         plt.figure(figsize=(14,8))
         plt.title(f'Τοπικό σφάλμα άμεσης συν-προσομοίωσης με μεταβλητό βήμα και μέθοδο' 
                   f' {self.cosiMethod}')
-        plt.plot(self.time[0::2], self.ESTY1, 
+        plt.plot(self.time[10::2], self.ESTY1[5::], 
                  label='$Richardson Extrapolation Error y_{1}$')
-        plt.plot(self.time[0::2], self.ESTY2, 
+        plt.plot(self.time[10::2], self.ESTY2[5::], 
                  label='$Richardson Extrapolation Error y_{2}$')
         plt.xlabel('time (sec)')
         plt.ylabel('Local Error(t)')
