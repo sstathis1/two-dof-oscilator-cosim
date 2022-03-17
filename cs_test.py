@@ -5,17 +5,19 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from Richardson import Orchestrator
+from Richardson_PI import Orchestrator
 import numpy as np
 import time
 
 start_time = time.perf_counter()
 
 # Specify the data of the 2-DOF linear oscilator
-m = 10   # (kg)
-k = 10   # (N/m)
-c = 10   # (Nsec/m)
-cc = 5   # (Nsec/m)
+m = 1   # (kg)
+k = 100   # (N/m)
+
+# Specify a Rayleigh damping. C = β * Κ where β = c / k = 1 / (10 * ω1)
+c = 0.1 * (k * m)**0.5   # (Nsec/m)
+cc = c   # (Nsec/m)
 
 # Specify the initial conditions for the simulation
 x10 = 0  # (m)
