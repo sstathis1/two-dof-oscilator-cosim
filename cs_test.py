@@ -5,7 +5,7 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from Richardson_PI import Orchestrator
+from Richardson import Orchestrator
 import numpy as np
 import time
 
@@ -44,7 +44,7 @@ polyDegree = 0
 h = 1
 
 # Oscilation method of models
-Model1Method = 'Force'
+Model1Method = 'Disp'
 Model2Method = 'Disp'
 
 # Co-simulation comunication method to use
