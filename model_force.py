@@ -11,7 +11,6 @@ class odfOscilatorForce:
     @author: Stefanos Stathis
     """
     
-    
     def __init__(self, m, k, c, cc, integration_method = 'Newmark'):
         """
         Initializes the model object.
