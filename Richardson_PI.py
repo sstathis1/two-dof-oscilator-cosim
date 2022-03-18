@@ -52,7 +52,7 @@ class Orchestrator():
         self.HMIN = 1e-4
     
     
-    def setModel1(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
+    def setModel1(self, m, k, c, oscMethod, integrationMethod, h=10):
         """
         Creates an object for the first model
         
@@ -76,7 +76,7 @@ class Orchestrator():
             self.U1 = np.array([[], []])
         
     
-    def setModel2(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
+    def setModel2(self, m, k, c, oscMethod, integrationMethod, h=10):
         """
         Creates an object for the second model
         

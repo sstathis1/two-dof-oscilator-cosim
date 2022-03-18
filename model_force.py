@@ -90,12 +90,12 @@ class odfOscilatorForce:
         return([x[1], -self.k/self.m*x[0] - self.c/self.m*x[1] + self.input(t)/self.m])  
 
 
-    def solve(self, h=1e-3):
+    def solve(self, micro_steps=10):
         """
         Solves the differential equation starting from initial conditions X0 for the time window specified from teval.
 
         Input:
-        h : micro step size (defaults to 0.001) should be at least 0.1 * Macro step size.
+        micro_steps : micro steps to take (defaults to 10).
 
         Returns:
         The solution of the differential equation at tfinal specified in the teval input.
@@ -103,7 +103,8 @@ class odfOscilatorForce:
         
         """
         if self.integration_method == 'Newmark':
-            self.micro_steps = int((self.tf - self.t0)/h)
+            self.micro_steps = micro_steps
+            h = (self.tf - self.t0) / self.micro_steps
             t = np.linspace(self.t0, self.tf, self.micro_steps+1)
             x_prev = self.X0[0]
             xdot_prev = self.X0[1]
@@ -126,7 +127,7 @@ class odfOscilatorForce:
             out = np.dot(self.C, states) + np.dot(self.D, self.input(self.tf))
         else:
             sol = solve_ivp(self.ode, [self.t0, self.tf], self.X0, 
-                            method=self.integration_method, max_step=h)
+                            method=self.integration_method)
             states = np.array([[sol.y[0][-1]], [sol.y[1][-1]]]).reshape(2, 1)
             out = np.dot(self.C, states) + np.dot(self.D, self.input(self.tf))
         return(states, out.reshape(-1, 1))
