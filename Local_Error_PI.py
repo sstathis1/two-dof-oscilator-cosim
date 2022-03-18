@@ -39,7 +39,7 @@ class Orchestrator():
         self.currentMacro = 0
         
     
-    def setModel1(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
+    def setModel1(self, m, k, c, oscMethod, integrationMethod, h=10):
         """
         Creates an object for the first model
         
@@ -61,7 +61,7 @@ class Orchestrator():
             self.U1 = np.zeros((2, self.macroSteps+1))
         
     
-    def setModel2(self, m, k, c, oscMethod, integrationMethod, h=1e-3):
+    def setModel2(self, m, k, c, oscMethod, integrationMethod, h=10):
         """
         Creates an object for the second model
         
