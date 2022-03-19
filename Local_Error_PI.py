@@ -340,21 +340,34 @@ class Orchestrator():
                                                       + self.couplingForce[self.currentMacro])
 
 
-    def plotOutputs(self):
-        """Plots the numerical positions x1num and x2num and compares them with the analytical positions x1anal, x2anal"""
+    def plotPositions(self):
+        """Plots the analytical positions x1anal, x2anal"""
         plt.figure(figsize=(14,8))
-        plt.title('Απόκριση Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
-                  f' {self.cosiMethod}')
-        plt.plot(self.time, self.Z1[0, :], label='$x_{1}$')
-        plt.plot(self.time, self.Z2[0, :], label='$x_{2}$')
-        plt.plot(self.time, self.x1Analytical, '--', label='$x_{1,analytical}$')
-        plt.plot(self.time, self.x2Analytical, '--', label='$x_{2,analytical}$')
-        plt.xlabel('time (sec)')
+        plt.title('Αναλυτική Απόκριση Θέσεων Διβάθμιου Ταλαντωτή' 
+                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
+        plt.plot(self.time, self.x1Analytical, label='$x_{1,analytical}$')
+        plt.plot(self.time, self.x2Analytical, label='$x_{2,analytical}$')
+        plt.xlabel('time (s)')
         plt.ylabel('x(t) (m)')
         plt.grid()
         plt.xlim(xmin=0, xmax=self.endTime)
         plt.legend()
         plt.show()   
+        
+
+    def plotVelocities(self):
+        """Plots the analytical velocities v1anal, v2anal"""
+        plt.figure(figsize=(14,8))
+        plt.title('Αναλυτική Απόκριση Ταχυτήτων Διβάθμιου Ταλαντωτή' 
+                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
+        plt.plot(self.time, self.v1Analytical, label='$v_{1,analytical}$')
+        plt.plot(self.time, self.v2Analytical, label='$v_{2,analytical}$')
+        plt.xlabel('time (s)')
+        plt.ylabel('v(t) (m/s)')
+        plt.grid()
+        plt.xlim(xmin=0, xmax=self.endTime)
+        plt.legend()
+        plt.show() 
         
         
     def plotLocalError(self):
@@ -362,8 +375,8 @@ class Orchestrator():
         plt.figure(figsize=(14,8))
         plt.title(f'Σχετικό σφάλμα άμεσης συν-προσομοίωσης με βήμα {self.stepDuration}' 
                   f' {self.cosiMethod}')
-        plt.plot(self.time, self.localErrorY1[0, :], label='$Local Error 1$')
-        plt.plot(self.time, self.localErrorY2[0, :], label='$Local Error 2$')
+        plt.plot(self.time[10::], self.localErrorY1[0, 10::], label='$Local Error 1$')
+        plt.plot(self.time[10::], self.localErrorY2[0, 10::], label='$Local Error 2$')
         plt.xlabel('time (sec)')
         plt.ylabel('RelativeError(t) (-)')
         plt.grid()
