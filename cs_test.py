@@ -5,7 +5,7 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from Richardson_PI import Orchestrator
+from Richardson import Orchestrator
 import numpy as np
 import time
 
@@ -79,6 +79,7 @@ Co_Sim.beginSimulation(initial1, initial2, y1, y2)
 end_time = time.perf_counter()
 print(f"Co-Simulation finished correctly in : {end_time-start_time} second(s)")
 
-Co_Sim.plotOutputs()
+Co_Sim.plotPositions()
+Co_Sim.plotVelocities()
 Co_Sim.plotLocalError()
 Co_Sim.plotStepSize()
