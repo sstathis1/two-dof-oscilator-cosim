@@ -215,7 +215,7 @@ class Orchestrator():
             self.doubleStepCheck = False
         self.analyticalSolution()
         self.calculateError()
-        return (self.absoluteError1, self.absoluteError2)
+        #return (self.absoluteError1, self.absoluteError2)
         return (self.ESTY1, self.ESTY2)
         
     
