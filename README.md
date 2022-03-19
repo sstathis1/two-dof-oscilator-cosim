@@ -10,8 +10,8 @@ Contain a master class for simulating 2 slave models.
 
 ## Model scripts
 Contain the solver for a model of a one-degree of freedom linear oscilator.
-* **model_disp.py** : Solver for a displacement excitated mass with spring-damper.
-* **model_force.py** : Solver for a force excitated mass with spring-damper.
+* **model_disp.py** : Solver for a displacement excitated mass with spring-damper. **Newmark - RK45 (solveivp)**
+* **model_force.py** : Solver for a force excitated mass with spring-damper. **Newmark - RK45 (solveivp)**
 
 ## Test scripts
 Contain some test scripts for initialization of the master objects and for ploting relevant data.
