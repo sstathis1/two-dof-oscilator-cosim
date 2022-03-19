@@ -481,17 +481,34 @@ class Orchestrator():
         self.Hn = np.append(self.Hn, self.stepDuration)
 
 
-    def plotOutputs(self):
+    def plotPositions(self):
         """Plots the numerical positions x1num and x2num and compares them with the analytical positions x1anal, x2anal"""
         plt.figure(figsize=(14,8))
-        plt.title('Απόκριση Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
-                  f' {self.cosiMethod}')
+        plt.title('Απόκριση Θέσεων Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
+                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
         plt.plot(self.time, self.Z1[0, :], label='$x_{1}$')
         plt.plot(self.time, self.Z2[0, :], label='$x_{2}$')
         plt.plot(self.time, self.x1Analytical, '--', label='$x_{1,analytical}$')
         plt.plot(self.time, self.x2Analytical, '--', label='$x_{2,analytical}$')
-        plt.xlabel('time (sec)')
+        plt.xlabel('time (s)')
         plt.ylabel('x(t) (m)')
+        plt.grid()
+        plt.xlim(xmin=0, xmax=self.endTime)
+        plt.legend()
+        plt.show()   
+        
+
+    def plotVelocities(self):
+        """Plots the numerical velocities v1num and v2num and compares them with the analytical velocities v1anal, v2anal"""
+        plt.figure(figsize=(14,8))
+        plt.title('Απόκριση Ταχυτήτων Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
+                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
+        plt.plot(self.time, self.Z1[1, :], label='$v_{1}$')
+        plt.plot(self.time, self.Z2[1, :], label='$v_{2}$')
+        plt.plot(self.time, self.v1Analytical, '--', label='$v_{1,analytical}$')
+        plt.plot(self.time, self.v2Analytical, '--', label='$v_{2,analytical}$')
+        plt.xlabel('time (s)')
+        plt.ylabel('v(t) (m/s)')
         plt.grid()
         plt.xlim(xmin=0, xmax=self.endTime)
         plt.legend()
