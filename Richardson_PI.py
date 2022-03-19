@@ -431,6 +431,8 @@ class Orchestrator():
         self.v2Analytical = 1/sqrt(2*m)*(t1Dot - t2Dot).reshape(-1)
         self.Z1Analytical = np.array([self.x1Analytical, self.v1Analytical])
         self.Z2Analytical = np.array([self.x2Analytical, self.v2Analytical])
+        self.couplingForce = (self.kc*(self.x2Analytical - self.x1Analytical)
+                             +self.cc*(self.v2Analytical - self.v1Analytical))
         
         
     def calculateError(self):
