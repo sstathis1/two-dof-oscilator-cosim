@@ -5,7 +5,7 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from Richardson import Orchestrator
+from Local_Error import Orchestrator
 import numpy as np
 import time
 
@@ -38,13 +38,13 @@ tf = 12
 H = 1e-2
 
 # Interpolation / Extrapolation degree
-polyDegree = 0
+polyDegree = 2
 
 micro_steps = 5
 
 # Oscilation method of models
-Model1Method = 'Force'
-Model2Method = 'Force'
+Model1Method = 'Disp'
+Model2Method = 'Disp'
 
 # Solver to use
 solver_first = "Newmark"
