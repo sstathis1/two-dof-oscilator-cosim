@@ -75,8 +75,8 @@ for i in range(len(h)):
     Co_Sim = Orchestrator(h[i], polyDegree, tf, k, cc, CoSimMethod)
     Co_Sim.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
     Co_Sim.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
-    sim_start = time.perf_counter()
     print(f"Begining simulation with H = {h[i]}...")
+    sim_start = time.perf_counter()
     absoluteError1, absoluteError2 = Co_Sim.beginSimulation(initial1, initial2, y1, y2)
     sim_finish = time.perf_counter()
     print(f"Finished simulation of H = {h[i]} in {sim_finish - sim_start} second(s)")
