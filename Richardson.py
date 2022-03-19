@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from  model_disp import odfOscilatorDisp
 from model_force import odfOscilatorForce
-import sys
 from math import cos, sin, sqrt, exp					
 
 
@@ -216,7 +215,7 @@ class Orchestrator():
             self.doubleStepCheck = False
         self.analyticalSolution()
         self.calculateError()
-        #return (self.absoluteError1, self.absoluteError2)
+        return (self.absoluteError1, self.absoluteError2)
         return (self.ESTY1, self.ESTY2)
         
     
@@ -394,25 +393,17 @@ class Orchestrator():
         t2 = np.zeros((len(self.time), 1))
         t1Dot = np.zeros((len(self.time), 1))
         t2Dot = np.zeros((len(self.time), 1))
+        A1 = np.array([t0[0], t0[1]])
+        A2 = np.array([(t0_dot[0] + z1 * w1 * t0[0]) / wd1, (t0_dot[1] + z2 * w2 * t0[1]) / wd2])
         for i in range(len(self.time)):
-            t1[i] = ((t0[0]*cos(wd1*self.time[i])
-                    +((t0_dot[0]+z1*w1*t0[0])/wd1)
-                    *sin(wd1*self.time[i]))*exp(-z1*w1*self.time[i]))
-            t1Dot[i] = ((t0[0]*cos(wd1*self.time[i])
-                         +((t0_dot[0]+z1*w1*t0[0])/wd1)
-                         *sin(wd1*self.time[i]))*exp(-z1*w1*self.time[i])*(-z1*w1)
-                        -t0[0]*wd1*sin(wd1*self.time[i])
-                        +((t0_dot[0]+z1*w1*t0[0])/wd1)*wd1*cos(wd1*self.time[i])
-                        *exp(-z1*w1*self.time[i]))
-            t2[i] = ((t0[1]*cos(wd2*self.time[i])
-                    +((t0_dot[1]+z2*w2*t0[1])/wd2)
-                    *sin(wd2*self.time[i]))*exp(-z2*w2*self.time[i]))
-            t2Dot[i] = ((t0[1]*cos(wd2*self.time[i])
-                         +((t0_dot[1]+z2*w2*t0[1])/wd2)
-                         *sin(wd2*self.time[i]))*exp(-z2*w2*self.time[i])*(-z2*w2)
-                        -t0[1]*wd2*sin(wd2*self.time[i])
-                        +((t0_dot[1]+z2*w2*t0[1])/wd2)*wd2*cos(wd2*self.time[i])
-                        *exp(-z2*w2*self.time[i]))
+            t1[i] = ((A1[0] * cos(wd1 * self.time[i]) + A2[0] * sin(wd1 * self.time[i])) 
+            * exp(- z1 * w1 * self.time[i]))
+            t2[i] = ((A1[1] * cos(wd2 * self.time[i]) + A2[1] * sin(wd2 * self.time[i])) 
+            * exp(- z2 * w2 * self.time[i]))
+            t1Dot[i] = ((wd1 * A2[0] - z1 * w1 * A1[0]) * cos(wd1 * self.time[i]) 
+            - (wd1 * A1[0] + z1 * w1 * A2[0]) * sin(wd1 * self.time[i])) * exp(-z1 * w1 * self.time[i])
+            t2Dot[i] = ((wd2 * A2[1] - z2 * w2 * A1[1]) * cos(wd2 * self.time[i]) 
+            - (wd2 * A1[1] + z2 * w2 * A2[1]) * sin(wd2 * self.time[i])) * exp(-z2 * w2 * self.time[i])
         self.x1Analytical = 1/sqrt(2*m)*(t1 + t2).reshape(-1)
         self.v1Analytical = 1/sqrt(2*m)*(t1Dot + t2Dot).reshape(-1)
         self.x2Analytical = 1/sqrt(2*m)*(t1 - t2).reshape(-1)
@@ -441,23 +432,39 @@ class Orchestrator():
                                     -self.Y2[:, self.currentMacro].reshape(-1,1)))
 
 
-
-    def plotOutputs(self):
+    def plotPositions(self):
         """Plots the numerical positions x1num and x2num and compares them with the analytical positions x1anal, x2anal"""
         plt.figure(figsize=(14,8))
-        plt.title('Απόκριση Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
+        plt.title('Απόκριση Θέσεων Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
                   f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
         plt.plot(self.time, self.Z1[0, :], label='$x_{1}$')
         plt.plot(self.time, self.Z2[0, :], label='$x_{2}$')
         plt.plot(self.time, self.x1Analytical, '--', label='$x_{1,analytical}$')
         plt.plot(self.time, self.x2Analytical, '--', label='$x_{2,analytical}$')
-        plt.xlabel('time (sec)')
+        plt.xlabel('time (s)')
         plt.ylabel('x(t) (m)')
         plt.grid()
         plt.xlim(xmin=0, xmax=self.endTime)
         plt.legend()
         plt.show()   
         
+
+    def plotVelocities(self):
+        """Plots the numerical velocities v1num and v2num and compares them with the analytical velocities v1anal, v2anal"""
+        plt.figure(figsize=(14,8))
+        plt.title('Απόκριση Ταχυτήτων Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
+                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
+        plt.plot(self.time, self.Z1[1, :], label='$v_{1}$')
+        plt.plot(self.time, self.Z2[1, :], label='$v_{2}$')
+        plt.plot(self.time, self.v1Analytical, '--', label='$v_{1,analytical}$')
+        plt.plot(self.time, self.v2Analytical, '--', label='$v_{2,analytical}$')
+        plt.xlabel('time (s)')
+        plt.ylabel('v(t) (m/s)')
+        plt.grid()
+        plt.xlim(xmin=0, xmax=self.endTime)
+        plt.legend()
+        plt.show()
+
         
     def plotLocalError(self):
         """Plots the local error estimations for y1, y2 that were computed"""
@@ -474,7 +481,8 @@ class Orchestrator():
         plt.xlim(xmin=0, xmax=self.endTime)
         plt.legend()
         plt.show()   
-        
+
+
     def plotGlobalError(self):
         """
         Plots the absolute global error of the forces if oscilation method is 'Force' or of the positions if oscilation method 
