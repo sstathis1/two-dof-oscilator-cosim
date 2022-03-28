@@ -485,7 +485,7 @@ class Orchestrator():
 
     def plotPositions(self):
         """Plots the numerical positions x1num and x2num and compares them with the analytical positions x1anal, x2anal"""
-        plt.figure(figsize=(14,8))
+        plt.figure(figsize=(6,4), dpi=150)
         plt.title('Απόκριση Θέσεων Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
                   f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
         plt.plot(self.time, self.Z1[0, :], label='$x_{1}$')
@@ -502,7 +502,7 @@ class Orchestrator():
 
     def plotVelocities(self):
         """Plots the numerical velocities v1num and v2num and compares them with the analytical velocities v1anal, v2anal"""
-        plt.figure(figsize=(14,8))
+        plt.figure(figsize=(6,4), dpi=150)
         plt.title('Απόκριση Ταχυτήτων Διβάθμιου Ταλαντωτή μέσω Άμμεσης Συν-Προσομοίωσης' 
                   f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
         plt.plot(self.time, self.Z1[1, :], label='$v_{1}$')
@@ -519,7 +519,7 @@ class Orchestrator():
         
     def plotLocalError(self):
         """Plots the local error estimations for y1, y2 that were computed"""
-        plt.figure(figsize=(14,8))
+        plt.figure(figsize=(6,4), dpi=150)
         plt.title(f'Τοπικό σφάλμα άμεσης συν-προσομοίωσης με μεταβλητό βήμα και μέθοδο' 
                   f' {self.cosiMethod}')
         plt.plot(self.time[10::2], self.ESTY1[5::], 
@@ -539,7 +539,7 @@ class Orchestrator():
         Plots the absolute global error of the forces if oscilation method is 'Force' or of the positions if oscilation method 
         is 'Disp
         '"""
-        plt.figure(figsize=(14,8))
+        plt.figure(figsize=(6,4), dpi=150)
         plt.title(f'Ολικό σφάλμα άμεσης συν-προσομοίωσης με μεταβλητό βήμα και μέθοδο' 
                   f' {self.cosiMethod}')
         if self.oscMethod2 == 'Disp':
@@ -560,7 +560,7 @@ class Orchestrator():
         
     def plotStepSize(self):
         """Plots the step size over the time of the simulation"""
-        plt.figure(figsize=(14,8))
+        plt.figure(figsize=(6,4), dpi=150)
         plt.title('Απόκριση Μεταβλητού Βήματος άμεσης συν-προσομοίωσης')
         plt.plot(self.time[0::2], self.Hn)
         plt.xlabel('time [sec]')

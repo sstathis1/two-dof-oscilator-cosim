@@ -371,9 +371,8 @@ class Orchestrator():
 
     def plotPositions(self):
         """Plots the analytical positions x1anal, x2anal"""
-        plt.figure(figsize=(14,8))
-        plt.title('Αναλυτική Απόκριση Θέσεων Διβάθμιου Ταλαντωτή' 
-                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
+        plt.figure(figsize=(6,4), dpi=200)
+        plt.title('Αναλυτική Απόκριση Θέσεων Διβάθμιου Ταλαντωτή')
         plt.plot(self.time, self.x1Analytical, label='$x_{1,analytical}$')
         plt.plot(self.time, self.x2Analytical, label='$x_{2,analytical}$')
         plt.xlabel('time (s)')
@@ -386,9 +385,8 @@ class Orchestrator():
 
     def plotVelocities(self):
         """Plots the analytical velocities v1anal, v2anal"""
-        plt.figure(figsize=(14,8))
-        plt.title('Αναλυτική Απόκριση Ταχυτήτων Διβάθμιου Ταλαντωτή' 
-                  f' {self.cosiMethod} , {self.oscMethod1} - {self.oscMethod2}, k = {self.polyDegree}')
+        plt.figure(figsize=(6,4), dpi=200)
+        plt.title('Αναλυτική Απόκριση Ταχυτήτων Διβάθμιου Ταλαντωτή')
         plt.plot(self.time, self.v1Analytical, label='$v_{1,analytical}$')
         plt.plot(self.time, self.v2Analytical, label='$v_{2,analytical}$')
         plt.xlabel('time (s)')
@@ -401,7 +399,7 @@ class Orchestrator():
         
     def plotLocalError(self):
         """Plots the local error estimations for y1, y2 that were computed"""
-        plt.figure(figsize=(14,8))
+        plt.figure(figsize=(6,4), dpi=200)
         plt.title(f'Σχετικό σφάλμα άμεσης συν-προσομοίωσης με βήμα {self.stepDuration}' 
                   f' {self.cosiMethod}')
         plt.plot(self.time[10::], self.localErrorY1[0, 10::], label='$Local Error 1$')
