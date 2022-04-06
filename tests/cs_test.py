@@ -5,7 +5,7 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from context import sample
+import context
 from sample.local import Orchestrator
 import numpy as np
 import time

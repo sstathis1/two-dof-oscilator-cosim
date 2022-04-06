@@ -4,7 +4,7 @@ Created on Tue Nov  2 17:58:39 2021
 @author: MrStevenn007
 """
 
-from context import sample
+import context
 from sample.richardson_pi import Orchestrator
 from sample.richardson import Orchestrator as Orchestrator_constantStep
 import numpy as np

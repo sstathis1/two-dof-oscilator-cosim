@@ -5,7 +5,7 @@ and the error estimated through richardson extrapolation technique.
 @author: Stefanos Stathis
 """
 
-from context import sample
+import context
 from sample.richardson import Orchestrator as master_richardson
 from sample.richardson_pi import Orchestrator as master_richardson_PI
 from sample.local import Orchestrator as master_local
