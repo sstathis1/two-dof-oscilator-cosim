@@ -5,7 +5,8 @@ of an explicit co-simulation of a linear 2dof oscilator.
 @author: Stefanos Stathis
 """
 
-from Richardson import Orchestrator
+from context import sample
+from sample.richardson import Orchestrator
 import matplotlib.pyplot as plt
 import numpy as np
 import time

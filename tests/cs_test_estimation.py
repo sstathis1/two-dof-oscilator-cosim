@@ -5,10 +5,11 @@ and the error estimated through richardson extrapolation technique.
 @author: Stefanos Stathis
 """
 
-from Richardson import Orchestrator as master_richardson
-from Richardson_PI import Orchestrator as master_richardson_PI
-from Local_Error import Orchestrator as master_local
-from Local_Error_PI import Orchestrator as master_local_PI
+from context import sample
+from sample.richardson import Orchestrator as master_richardson
+from sample.richardson_pi import Orchestrator as master_richardson_PI
+from sample.local import Orchestrator as master_local
+from sample.local_pi import Orchestrator as master_local_PI
 import matplotlib.pyplot as plt
 import numpy as np
 import time

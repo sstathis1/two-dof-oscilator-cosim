@@ -4,8 +4,9 @@ Created on Tue Nov  2 17:58:39 2021
 @author: MrStevenn007
 """
 
-from Orchestrator_2DoF_Richardson1_Step_Size_Control import Orchestrator
-from Orchestrator_2DoF_Richardson_1 import Orchestrator as Orchestrator_constantStep
+from context import sample
+from sample.richardson_pi import Orchestrator
+from sample.richardson import Orchestrator as Orchestrator_constantStep
 import numpy as np
 import time
 

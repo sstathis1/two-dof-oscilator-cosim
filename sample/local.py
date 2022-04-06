@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from  model_disp import odfOscilatorDisp
-from model_force import odfOscilatorForce
+from  .model_disp import odfOscilatorDisp
+from .model_force import odfOscilatorForce
 import sys
 from math import cos, sin, sqrt, exp
 

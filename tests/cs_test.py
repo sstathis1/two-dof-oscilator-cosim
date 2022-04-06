@@ -5,7 +5,8 @@ as well as the global and local errors.
 @author: Stefanos Stathis
 """
 
-from Local_Error import Orchestrator
+from context import sample
+from sample.local import Orchestrator
 import numpy as np
 import time
 
