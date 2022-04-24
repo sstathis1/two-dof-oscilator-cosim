@@ -146,7 +146,7 @@ class odfOscilatorDisp:
             out = np.dot(self.C, states) + np.dot(self.D, self.input)
         else:
             sol = solve_ivp(self.ode, [self.t0, self.tf], self.X0, 
-                            method=self.integration_method)
+                            method=self.integration_method, atol=1e-13, rtol=1e-9)
             states = np.array([[sol.y[0][-1]], [sol.y[1][-1]]]).reshape(2, 1)
             self.input = np.array([self.input1(self.tf), self.input2(self.tf)]).reshape(2, 1)
             out = np.dot(self.C, states) + np.dot(self.D, self.input)
