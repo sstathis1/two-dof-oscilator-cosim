@@ -41,7 +41,7 @@ def main():
     tf = 12
 
     # Interpolation / Extrapolation degree
-    polyDegree = 0
+    polyDegree = 2
 
     # Macro step
     H = 1e-3
@@ -50,14 +50,14 @@ def main():
 
     # Oscilation method of models
     Model1Method = "Force"
-    Model2Method = "Disp"
+    Model2Method = "Force"
 
     # Solver to use
     solver_first = "Newmark"
     solver_second = "RK45"
 
     # Co-simulation comunication method to use
-    CoSimMethod = "Jacobi"
+    CoSimMethod = "Gauss"
 
     if Model1Method == "Force":
         y2 = lc0
@@ -90,80 +90,71 @@ def fixed_step(m, k, c, H, polyDegree, tf, cc, CoSimMethod, Model1Method, Model2
     Does a fixed step simulation for the local error then 
     does a fixed step simulation for richardson estimation and compares them.
     """
-
-    start_time = time.perf_counter()
-
-    # Initialize the Co-Simulation for the analytical local error
-    print("Begining of simulation for local error...")
-    Co_Sim = master_local(H, polyDegree, tf, k, cc, CoSimMethod)
-
-    # Create the 2 Subsystem models
-    Co_Sim.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
-    Co_Sim.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
-
-    # Begin the Co-Simulation for the analytical local error
-    sim_start_local = time.perf_counter()
-    (localErrorX1, localErrorX2, localErrorV1,
-    localErrorV2, localErrorY1, localErrorY2) = Co_Sim.beginSimulation(initial1, initial2, y1, y2)
-    sim_end_local = time.perf_counter()
-    print(f"Succesfully finished local error simulation in {sim_end_local - sim_start_local} second(s)")
-
-    # Initialize the Co-Simulation for the Richardson Extrapolation Error Estimate
-    print("Begining of simulation for richardson estimation...")
-    Co_SimRichardson = master_richardson(H, polyDegree, tf, k, cc, CoSimMethod)
-
-    # Create the 2 Subsystem models
-    Co_SimRichardson.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
-    Co_SimRichardson.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
-
-    # Begin the Co-Simulation for the richardson extrapolation local error
-    sim_start_richardson = time.perf_counter()
-    ERichY1, ERichY2 = Co_SimRichardson.beginSimulation(initial1, initial2, y1, y2)
-    sim_end_richardson = time.perf_counter()
-    print(f"Succesfully finished richardson estimation simulation in {sim_end_richardson - sim_start_richardson} second(s)")
-
-    end_time = time.perf_counter()
-    print(f"Succesfully finished fixed step simulations in {end_time - start_time} second(s)")
-
     # Plot Local Error of outputs
-    plt.figure(figsize=(14,8))
-    plt.title(f'Τοπικό Σφαλμα εξόδων λόγω συν-προσομοίωσης: {CoSimMethod}, {Model1Method} - {Model2Method}, k = {polyDegree}')
-    plt.plot(Co_Sim.time[10:], localErrorY1[0, 10:], label='Local Error $y_1$')
-    plt.plot(Co_Sim.time[10:], localErrorY2[0, 10:], label='Local Error $y_2$')
-    plt.plot(Co_Sim.time[10:], ERichY1[0, 10:], '--', 
-            label='Richardson Extrapolation Estimation $Y_1$')
-    plt.plot(Co_Sim.time[10:], ERichY2[0, 10:], '--',
-            label='Richardson Extrapolation Estimation $Y_2$')
-    plt.xlabel('time (s)')
-    plt.ylabel('Local Error y')
-    plt.grid()
-    plt.xlim(xmin=0, xmax=tf)
-    plt.legend()
+    SMALL_SIZE = 8
+    MEDIUM_SIZE = 12
+    BIGGER_SIZE = 14
+
+    plt.rc('font', size=SMALL_SIZE, weight = 'bold')          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE, labelweight = 'bold')     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE, labelweight = 'bold')    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+    fig, axs = plt.subplots(1, 2, dpi=150)
+    fig.suptitle(f"Τοπικό Σφαλμα εξόδων λόγω συν-προσομοίωσης: {CoSimMethod}, {Model1Method} - {Model2Method}", 
+        fontweight='bold') 
+
+    i = 0
+    start_time = time.perf_counter()
+    for polyDegree in [0, 1]:
+        # Initialize the Co-Simulation for the analytical local error
+        print("Begining of simulation for local error...")
+        Co_Sim = master_local(H, polyDegree, tf, k, cc, CoSimMethod)
+
+        # Create the 2 Subsystem models
+        Co_Sim.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
+        Co_Sim.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
+
+        # Begin the Co-Simulation for the analytical local error
+        sim_start_local = time.perf_counter()
+        (localErrorX1, localErrorX2, localErrorV1,
+        localErrorV2, localErrorY1, localErrorY2) = Co_Sim.beginSimulation(initial1, initial2, y1, y2)
+        sim_end_local = time.perf_counter()
+        print(f"Succesfully finished local error simulation in {sim_end_local - sim_start_local} second(s)")
+
+        # Initialize the Co-Simulation for the Richardson Extrapolation Error Estimate
+        print("Begining of simulation for richardson estimation...")
+        Co_SimRichardson = master_richardson(H, polyDegree, tf, k, cc, CoSimMethod)
+
+        # Create the 2 Subsystem models
+        Co_SimRichardson.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
+        Co_SimRichardson.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
+
+        # Begin the Co-Simulation for the richardson extrapolation local error
+        sim_start_richardson = time.perf_counter()
+        ERichY1, ERichY2 = Co_SimRichardson.beginSimulation(initial1, initial2, y1, y2)
+        sim_end_richardson = time.perf_counter()
+        print(f"Succesfully finished richardson estimation simulation in {sim_end_richardson - sim_start_richardson} second(s)")
+
+        end_time = time.perf_counter()
+        print(f"Succesfully finished fixed step simulations in {end_time - start_time} second(s)")
+   
+        axs[i].set_title(f"Εκτίμηση τοπικών σφαλμάτων για k = {i}", fontweight='bold')
+        axs[i].plot(Co_Sim.time[10:], localErrorY1[0, 10:], label='$le^{y_1}$', linewidth=2.0)
+        axs[i].plot(Co_Sim.time[10:], localErrorY2[0, 10:], label='$le^{y_2}$', linewidth=2.0)
+        axs[i].plot(Co_Sim.time[10:], ERichY1[0, 10:], '--', 
+                label='$EST_{Y_1}$', linewidth=2.0)
+        axs[i].plot(Co_Sim.time[10:], ERichY2[0, 10:], '--',
+                label='$EST_{Y_2}$', linewidth=2.0)
+        axs[i].set(xlabel='time (s)', ylabel="$le^y$")
+        axs[i].grid()
+        axs[i].set_xlim([0, tf])
+
+        i += 1
     plt.show()
-
-    # Plot Local Error of position
-    plt.figure(figsize=(14,8))
-    plt.title('Τοπικό Σφαλμα θέσεων λόγω συν-προσομοίωσης')
-    plt.plot(Co_Sim.time[10:], localErrorX1[10:, 0], label='Local Error $x_1$')
-    plt.plot(Co_Sim.time[10:], localErrorX2[10:, 0], label='Local Error $x_2$')
-    plt.xlabel('time (s)')
-    plt.ylabel('Local Error x (m)')
-    plt.grid()
-    plt.xlim(xmin=0, xmax=tf)
-    plt.legend()
-    plt.show() 
-
-    # Plot Local Error of velocities
-    plt.figure(figsize=(14,8))
-    plt.title('Τοπικό Σφαλμα ταχυτήτων λόγω συν-προσομοίωσης')
-    plt.plot(Co_Sim.time[10:], localErrorV1[10:, 0], label='Local Error $v_1$')
-    plt.plot(Co_Sim.time[10:], localErrorV2[10:, 0], label='Local Error $v_2$')
-    plt.xlabel('time (s)')
-    plt.ylabel('Local Error v (m/s)')
-    plt.grid()
-    plt.xlim(xmin=0, xmax=tf)
-    plt.legend()
-    plt.show()  
 
 
 def addaptive_step(m, k, c, H, polyDegree, tf, cc, CoSimMethod, Model1Method, Model2Method, 
@@ -172,59 +163,81 @@ def addaptive_step(m, k, c, H, polyDegree, tf, cc, CoSimMethod, Model1Method, Mo
     Does an addaptive step simulation using richardson and PI controller then,
     does an addaptive step simulation for local error and compares them.
     """
+    # Plot Local Error of outputs
+    SMALL_SIZE = 10
+    MEDIUM_SIZE = 12
+    BIGGER_SIZE = 14
 
+    plt.rc('font', size=SMALL_SIZE, weight = 'bold')          # controls default text sizes
+    plt.rc('axes', titlesize=SMALL_SIZE, labelweight = 'bold')     # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE, labelweight = 'bold')    # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+    fig, axs = plt.subplots(2, 2, dpi=125)
+    fig.suptitle(f"Τοπικό Σφαλμα εξόδων μεταβλητού βήματος: {CoSimMethod}, {Model1Method} - {Model2Method}", 
+        fontweight='bold') 
+    axs[0, 0].set_title("Εκτίμηση τοπικών σφαλμάτων", fontweight='bold')
+    axs[0, 1].set_title("Απόκριση Μεταβλητού Βήματος άμεσης συν-προσομοίωσης", fontweight='bold')
+
+    i = 0
     start_time = time.perf_counter()
 
-    # Initialize the Co-Simulation for the analytical local error
-    print("Begining of simulation, richardson adaptive step...")
-    Co_SimRichardson = master_richardson_PI(H, polyDegree, tf, k, cc, CoSimMethod)
+    for polyDegree in [0, 1]:
+        # Initialize the Co-Simulation for the analytical local error
+        print("Begining of simulation, richardson adaptive step...")
+        Co_SimRichardson = master_richardson_PI(H, polyDegree, tf, k, cc, CoSimMethod)
 
-    # Create the 2 Subsystem models
-    Co_SimRichardson.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
-    Co_SimRichardson.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
+        # Create the 2 Subsystem models
+        Co_SimRichardson.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
+        Co_SimRichardson.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
 
-    # Begin the Co-Simulation for the analytical local error
-    sim_start = time.perf_counter()
-    ERichY1, ERichY2 = Co_SimRichardson.beginSimulation(initial1, initial2, y1, y2)
-    sim_end = time.perf_counter()
-    print(f"Succesfully finished richardson estimation simulation in {sim_end - sim_start} second(s)")
-    t = Co_SimRichardson.time[0::2]
+        # Begin the Co-Simulation for the analytical local error
+        sim_start = time.perf_counter()
+        ERichY1, ERichY2 = Co_SimRichardson.beginSimulation(initial1, initial2, y1, y2)
+        sim_end = time.perf_counter()
+        print(f"Succesfully finished richardson estimation simulation in {sim_end - sim_start} second(s)")
+        t = Co_SimRichardson.time[0::2]
 
-    # Initialize the Co-Simulation for the Richardson Extrapolation Error Estimate
-    print("Begining of simulation, local error adaptive step...")
-    Co_SimAnal = master_local_PI(t, polyDegree, tf, k, cc, CoSimMethod)
+        # Initialize the Co-Simulation for the Richardson Extrapolation Error Estimate
+        print("Begining of simulation, local error adaptive step...")
+        Co_SimAnal = master_local_PI(t, polyDegree, tf, k, cc, CoSimMethod)
 
-    # Create the 2 Subsystem models
-    Co_SimAnal.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
-    Co_SimAnal.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
+        # Create the 2 Subsystem models
+        Co_SimAnal.setModel1(m, k, c, Model1Method, solver_first, micro_steps) # First Subsystem
+        Co_SimAnal.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
 
-    # Begin the Co-Simulation for the richardson extrapolation local error
-    sim_start = time.perf_counter()
-    localErrorY1, localErrorY2 = Co_SimAnal.beginSimulation(initial1, initial2, y1, y2)
-    sim_end = time.perf_counter()
-    print(f"Succesfully finished local error simulation in {sim_end - sim_start} second(s)")
+        # Begin the Co-Simulation for the richardson extrapolation local error
+        sim_start = time.perf_counter()
+        localErrorY1, localErrorY2 = Co_SimAnal.beginSimulation(initial1, initial2, y1, y2)
+        sim_end = time.perf_counter()
+        print(f"Succesfully finished local error simulation in {sim_end - sim_start} second(s)")
 
-    end_time = time.perf_counter()
-    print(f"Succesfully finished addaptive step simulations in {end_time - start_time} second(s)")
+        end_time = time.perf_counter()
+        print(f"Succesfully finished addaptive step simulations in {end_time - start_time} second(s)")
 
-    # Plot Local Error of outputs
-    plt.figure(figsize=(14,8))
-    plt.title(f'Local Error Exact vs Richardson with addaptive step: {Model1Method} - {Model2Method}, {CoSimMethod}, k = {polyDegree}')
-    plt.plot(t[10::], localErrorY1[0, 10::], label='Local Error $y_1$')
-    plt.plot(t[10::], localErrorY2[0, 10::], label='Local Error $y_2$')
-    plt.plot(t[10::], ERichY1[10::], '--', 
-            label='Richardson Extrapolation Estimation Y1')
-    plt.plot(t[10::], ERichY2[10::], '--',
-            label='Richardson Extrapolation Estimation Y2')
-    plt.xlabel('time (sec)')
-    plt.ylabel('Local Error y')
-    plt.grid()
-    plt.xlim(xmin=0, xmax=tf)
-    plt.legend()
+        # Plot Local Error of outputs
+        axs[i, 0].plot(t[30::], localErrorY1[0, 30::], label='$le^{y_1}$', linewidth=2.0)
+        axs[i, 0].plot(t[30::], localErrorY2[0, 30::], label='$le^{y_2}$', linewidth=2.0)
+        axs[i, 0].plot(t[30::], ERichY1[30::], '--', label = '$EST_{Y_1}$', linewidth=2.0)
+        axs[i, 0].plot(t[30::], ERichY2[30::], '--',  label = '$EST_{Y_2}$', linewidth=2.0)
+        axs[i, 0].set(xlabel='time (s)', ylabel="$le^y$")
+        axs[i, 0].grid()
+        axs[i, 0].set_xlim([0, tf])
+        axs[0, 0].legend(loc='lower right')
+
+       # Plot Step Size
+        axs[i, 1].text(1.5, np.max(Co_SimRichardson.Hn) / 2, f"k = {i}", ha="center", 
+            va="center",  fontsize=16, fontweight='bold', 
+            bbox=dict(facecolor = 'orange', boxstyle="square"))
+        axs[i, 1].plot(t, Co_SimRichardson.Hn, linewidth=2.0)
+        axs[i, 1].set(xlabel = 'time (s)', ylabel = '$Η_n$ (s)')
+        axs[i, 1].grid()
+        axs[i, 1].set_xlim([0, tf])
+        i += 1
     plt.show()
-
-    Co_SimRichardson.plotStepSize()
-    Co_SimRichardson.plotGlobalError()
 
 
 if __name__ == "__main__":
