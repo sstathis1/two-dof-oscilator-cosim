@@ -6,12 +6,15 @@ of an explicit co-simulation of a linear 2dof oscilator.
 """
 
 import context
-from sample.richardson import Orchestrator
+from sample.local import Orchestrator
 import matplotlib.pyplot as plt
 import numpy as np
 import time
 
 start_time = time.perf_counter()
+
+# Specify mode to run -1 : global errors -2: local errors
+mode = "local"
 
 # Specify the data of the 2-DOF linear oscilator
 m = 1    # (kg)
@@ -50,7 +53,7 @@ solver_first = "Newmark"
 solver_second = "RK45"
 
 # Co-simulation comunication method to use
-CoSimMethod = "Jacobi"
+CoSimMethod = "Gauss"
 
 if Model1Method == "Force":
     y2 = lc0
@@ -80,13 +83,23 @@ for i in range(len(h)):
         Co_Sim.setModel2(m, k, c, Model2Method, solver_second, micro_steps) # Second Subsystem
         print(f"Begining simulation with H = {h[i]}...")
         sim_start = time.perf_counter()
-        absoluteError1, absoluteError2 = Co_Sim.beginSimulation(initial1, initial2, y1, y2)
-        sim_finish = time.perf_counter()
-        print(f"Finished simulation of H = {h[i]} in {sim_finish - sim_start} second(s)")
-        rmsErrorX1 = np.sqrt(np.mean(absoluteError1[0, 30::]**2))
-        rmsErrorX2 = np.sqrt(np.mean(absoluteError2[0, 30::]**2))
-        rmsErrorV1 = np.sqrt(np.mean(absoluteError1[1, 30::]**2))
-        rmsErrorV2 = np.sqrt(np.mean(absoluteError2[1, 30::]**2))
+        if mode == "global":
+            absoluteError1, absoluteError2 = Co_Sim.beginSimulation(initial1, initial2, y1, y2)
+            sim_finish = time.perf_counter()
+            print(f"Finished simulation of H = {h[i]} in {sim_finish - sim_start} second(s)")
+            rmsErrorX1 = np.sqrt(np.mean(absoluteError1[0, 5::]**2))
+            rmsErrorX2 = np.sqrt(np.mean(absoluteError2[0, 5::]**2))
+            rmsErrorV1 = np.sqrt(np.mean(absoluteError1[1, 5::]**2))
+            rmsErrorV2 = np.sqrt(np.mean(absoluteError2[1, 5::]**2))
+        else:
+            (local_error_X1, local_error_X2, local_error_V1, 
+            local_error_V2, local_error_Y1, local_error_Y2) = Co_Sim.beginSimulation(initial1, initial2, y1, y2)
+            sim_finish = time.perf_counter()
+            print(f"Finished simulation of H = {h[i]} in {sim_finish - sim_start} second(s)")
+            rmsErrorX1 = np.sqrt(np.mean(local_error_X1[5::]**2))
+            rmsErrorX2 = np.sqrt(np.mean(local_error_X2[5::]**2))
+            rmsErrorV1 = np.sqrt(np.mean(local_error_V1[5::]**2))
+            rmsErrorV2 = np.sqrt(np.mean(local_error_V2[5::]**2))
         errorX1[j, 0] = rmsErrorX1 
         errorX2[j, 0] = rmsErrorX2
         errorV1[j, 0] = rmsErrorV1
@@ -98,12 +111,14 @@ for i in range(len(h)):
 y1 = h**(1)
 y2 = h**(2)
 y3 = h**(3)
+y4 = h**(4)
+y5 = h**(5)
 
 end_time = time.perf_counter()
 print(f"Co-Simulations finished correctly in : {end_time-start_time} second(s)")
 
 # Plot global error convergence orders
-SMALL_SIZE = 9
+SMALL_SIZE = 8
 MEDIUM_SIZE = 12
 BIGGER_SIZE = 14
 
@@ -116,32 +131,33 @@ plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 fig, axs = plt.subplots(1, 2, dpi=150)
-fig.suptitle(f"Τάξη ολικών σφαλμάτων μέσω: {CoSimMethod}, {Model1Method} - {Model2Method}", fontweight='bold')
+fig.suptitle(f"Τάξη τοπικών σφαλμάτων μέσω: {CoSimMethod}, {Model1Method} - {Model2Method}", fontweight='bold')
 
 # Position subplots
 axs[0].set_title("θέσεων $x_1$", fontweight='bold')
-axs[0].plot(h, errorX1[0::3, 0], '*-', linewidth=3.0)
-axs[0].plot(h, errorX1[1::3, 0], '*-', linewidth=3.0)
-axs[0].plot(h, errorX1[2::3, 0], '*-', linewidth=3.0)
-axs[0].plot(h, y1, '--', linewidth=3.0)
-axs[0].plot(h, y2, '--', linewidth=3.0)
-axs[0].plot(h, y3, '--', linewidth=3.0)
-axs[0].set(xlabel = "Βήμα επικοινωνίας H (log)", ylabel="Ολικό σφάλμα $e^x_{rms}$ (log)")
+axs[0].plot(h, errorX2[0::3, 0], '*-', linewidth=3.0)
+axs[0].plot(h, errorX2[1::3, 0], '*-', linewidth=3.0)
+axs[0].plot(h, errorX2[2::3, 0], '*-', linewidth=3.0)
+axs[0].plot(h, y3, '--', color="C4", linewidth=3.0)
+axs[0].plot(h, y4, '--', color="C5", linewidth=3.0)
+l7,= axs[0].plot(h, y5, '--', color="C6", linewidth=3.0)
+axs[0].set(xlabel = "Βήμα επικοινωνίας H (log)", ylabel="Τοπικό σφάλμα $le^x_{rms}$ (log)")
 axs[0].grid()
 axs[0].set_xscale("log")
 axs[0].set_yscale("log")
 
 # Velocity subplots
 axs[1].set_title(f"ταχυτήτων $v_1$", fontweight='bold')
-axs[1].plot(h, errorV1[0::3, 0], '*-', label="k=0", linewidth=3.0)
-axs[1].plot(h, errorV1[1::3, 0], '*-', label="k=1", linewidth=3.0)
-axs[1].plot(h, errorV1[2::3, 0], '*-', label="k=2", linewidth=3.0)
-axs[1].plot(h, y1, '--', label="$O(H^1)$", linewidth=3.0)
-axs[1].plot(h, y2, '--', label="$O(H^2)$", linewidth=3.0)
-axs[1].plot(h, y3, '--', label="$O(H^3)$", linewidth=3.0)
-axs[1].set(xlabel = "Βήμα επικοινωνίας H (log)", ylabel="Ολικό σφάλμα $e^v_{rms}$ (log)")
+l1,= axs[1].plot(h, errorV2[0::3, 0], '*-', linewidth=3.0)
+l2,= axs[1].plot(h, errorV2[1::3, 0], '*-', linewidth=3.0)
+l3,= axs[1].plot(h, errorV2[2::3, 0], '*-', linewidth=3.0)
+l4,= axs[1].plot(h, y2, '--', linewidth=3.0)
+l5,= axs[1].plot(h, y3, '--', linewidth=3.0)
+l6,= axs[1].plot(h, y4, '--', linewidth=3.0)
+axs[1].set(xlabel = "Βήμα επικοινωνίας H (log)", ylabel="Τοπικό σφάλμα $le^v_{rms}$ (log)")
 axs[1].grid()
 axs[1].set_yscale("log")
 axs[1].set_xscale("log")
-plt.legend(bbox_to_anchor=(1,1), loc="upper left")
+plt.legend([l1, l2, l3, l4, l5, l6, l7], ["k=0", "k=1", "k=2", "$O(H^2)$", "$O(H^3)$", "$O(H^4)$", "$O(H^5)$"], 
+    bbox_to_anchor=(1,1), loc="upper left")
 plt.show()

@@ -6,7 +6,7 @@ as well as the global and local errors.
 """
 
 import context
-from sample.local import Orchestrator
+from sample.richardson import Orchestrator
 import numpy as np
 import time
 
@@ -36,10 +36,10 @@ initial2 = np.array([[x20], [v20]])
 tf = 12
 
 # Macro step
-H = 1e-2
+H = 1e-3
 
 # Interpolation / Extrapolation degree
-polyDegree = 2
+polyDegree = 1
 
 micro_steps = 5
 
@@ -83,4 +83,5 @@ print(f"Co-Simulation finished correctly in : {end_time-start_time} second(s)")
 Co_Sim.plotPositions()
 Co_Sim.plotVelocities()
 Co_Sim.plotLocalError()
+Co_Sim.plotGlobalError()
 Co_Sim.plotStepSize()
