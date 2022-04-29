@@ -473,9 +473,9 @@ class Orchestrator():
         plt.figure(figsize=(6,4), dpi=150)
         plt.title(f'Τοπικό σφάλμα άμεσης συν-προσομοίωσης με βήμα {self.stepDuration}' 
                   f' {self.cosiMethod}')
-        plt.plot(self.time[0::2], self.ESTY1[0, :], 
+        plt.plot(self.time[10::2], self.ESTY1[0, 5::], 
                  label='$Richardson Extrapolation Error x_{1}$')
-        plt.plot(self.time[0::2], self.ESTY2[0, :], 
+        plt.plot(self.time[10::2], self.ESTY2[0, 5::], 
                  label='$Richardson Extrapolation Error x_{2}$')
         plt.xlabel('time (sec)')
         plt.ylabel('Error(t) (-)')

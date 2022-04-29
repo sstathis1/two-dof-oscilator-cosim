@@ -46,8 +46,8 @@ class Orchestrator():
         # PI contoller settings
         self.a = 0.7/(self.polyDegree + 1)
         self.b = 0.4/(self.polyDegree + 1)
-        self.QMIN = 0.5
-        self.QMAX = 1.1
+        self.QMIN = 0.7
+        self.QMAX = 1.05
         # Minimum step size for the automatic step
         self.HMIN = 1e-4
     
@@ -65,7 +65,7 @@ class Orchestrator():
         h : micro step for Newmark
         """
         # Use Nyquist step as the maximum step the PI controller can select
-        self.HMAX = (3.1415 / sqrt(3 * k / m))
+        self.HMAX = (3.1415 / sqrt(3 * k / m)) / 5
         self.microStep1 = h
         self.oscMethod1 = oscMethod
         if self.oscMethod1 == 'Force':
@@ -464,11 +464,11 @@ class Orchestrator():
             self.ESTY2 = np.append(self.ESTY2, (2**(self.polyDegree+1)/(2**(self.polyDegree+1)-1)
                                *np.linalg.norm(self.y2Double-self.Y2[self.currentMacro].reshape(-1,1))))  
         if self.oscMethod1 == "Force" and self.oscMethod2 == "Force":
-            self.TOL = 1e-1
+            self.TOL = 1e-3
         elif self.oscMethod1 == "Force" and self.oscMethod2 == "Disp" and self.cosiMethod == "Jacobi":
-            self.TOL = 1e-1
+            self.TOL = 1e-3
         else:
-            self.TOL = 1e-4
+            self.TOL = 8e-7
         self.ERR = np.append(self.ERR, (((self.TOL/np.maximum(self.ESTY1[self.tmp], 
                                  self.ESTY2[self.tmp]))**self.a)*((np.maximum(self.ESTY1[self.tmp-1], 
                                  self.ESTY2[self.tmp-1])/self.TOL)**self.b)))
@@ -522,9 +522,9 @@ class Orchestrator():
         plt.figure(figsize=(6,4), dpi=150)
         plt.title(f'Τοπικό σφάλμα άμεσης συν-προσομοίωσης με μεταβλητό βήμα και μέθοδο' 
                   f' {self.cosiMethod}')
-        plt.plot(self.time[10::2], self.ESTY1[5::], 
+        plt.plot(self.time[30::2], self.ESTY1[15::], 
                  label='$Richardson Extrapolation Error y_{1}$')
-        plt.plot(self.time[10::2], self.ESTY2[5::], 
+        plt.plot(self.time[30::2], self.ESTY2[15::], 
                  label='$Richardson Extrapolation Error y_{2}$')
         plt.xlabel('time (sec)')
         plt.ylabel('Local Error(t)')
