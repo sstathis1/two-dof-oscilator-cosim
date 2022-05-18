@@ -1,4 +1,4 @@
-# MyThesis-Project1
+# Two degree of freedom oscilator simulation, using explicit co-simulation
 Explicit methods for the co-simulation of a linear two-degrees of freedom oscilator. 
 
 This project was done as part of my thesis at Aristotle University of Thessaloniki at the Laboratory of Machine Dynamics.
