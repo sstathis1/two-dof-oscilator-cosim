@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches
+from matplotlib.animation import FuncAnimation
 from  .model_disp import odfOscilatorDisp
 from  .model_force import odfOscilatorForce
 from math import cos, sin, sqrt, exp					
@@ -501,3 +503,53 @@ class Orchestrator():
         plt.xlim(xmin=0, xmax=self.endTime)
         plt.legend()
         plt.show()
+
+    def animate(self, savefig=False):
+
+        def animations(i):
+            x = [-2, X1_0 + oscilator_width / 2 + x1[i], X2_0 + oscilator_width / 2 + x2[i], 2]
+            line.set_data(x, [0, 0, 0, 0])
+            m1.set_xy([X1_0 + x1[i], 0-oscilator_height/2])
+            m2.set_xy([X2_0 + x2[i], 0-oscilator_height/2])
+            time_text.set_text(time_template % (time[i]))
+            return line
+
+        # Time between two points in (s)
+        dt = 0.01
+
+        # Set dimensions of cart
+        oscilator_height = 0.4
+        oscilator_width = 0.4
+        line = 0.4
+
+        # x, time data from results for the two oscilators
+        x1 = self.Z1[0]
+        x2 = self.Z2[0]
+        time = self.time
+        X1_0 = -line - oscilator_width / 2
+        X2_0 = line + oscilator_width / 2
+
+        # Create the figure
+        fig = plt.figure(figsize=(6, 4), dpi=200)
+        ax = fig.add_subplot(xlim=(-2, 2), 
+                             ylim=(-0.3, 0.3))
+        ax.grid()
+        ax.set_xlabel("x (m)", fontweight='bold')
+        ax.set_ylabel("y (m)", fontweight='bold')
+        line, = ax.plot([], [], "o-", lw=2, color="#FA4616")
+        m1 = ax.add_patch(matplotlib.patches.Rectangle((X1_0, 0-oscilator_height/2), oscilator_width, oscilator_height,
+                            facecolor = "#005776",
+                            fill=True,
+                            lw=5))
+        m2 = ax.add_patch(matplotlib.patches.Rectangle((X2_0, 0-oscilator_height/2), oscilator_width, oscilator_height,
+                            facecolor = "#005776",
+                            fill=True,
+                            lw=5))
+        time_template = 'time = %.1fs'
+        time_text = ax.text(0.05, 0.95, '', transform=ax.transAxes, weight="bold")
+        ani = FuncAnimation(fig, animations, len(time), interval=dt*1000)
+        plt.show()
+
+        # Save animation in gif format
+        if savefig:
+            ani.save("two_dof_oscilator.gif", writer='pillow', fps=30)
