@@ -33,10 +33,10 @@ initial1 = np.array([[x10], [v10]])
 initial2 = np.array([[x20], [v20]])
 
 # Final time
-tf = 12
+tf = 6
 
 # Macro step
-H = 1e-3
+H = 1e-2
 
 # Interpolation / Extrapolation degree
 polyDegree = 1
@@ -80,6 +80,7 @@ Co_Sim.beginSimulation(initial1, initial2, y1, y2)
 end_time = time.perf_counter()
 print(f"Co-Simulation finished correctly in : {end_time-start_time} second(s)")
 
+Co_Sim.animate(savefig=True)
 Co_Sim.plotPositions()
 Co_Sim.plotVelocities()
 Co_Sim.plotLocalError()
